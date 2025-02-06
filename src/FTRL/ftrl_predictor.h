@@ -9,7 +9,7 @@
 struct predictor_option
 {
     predictor_option() : factor_num(8), threads_num(1), model_format("txt") {}
-    string model_path, model_format, predict_path, model_number_type;
+    string model_path, model_format, predict_path, model_number_type, column_name, combine_schema;
     int threads_num, factor_num;
     
     void parse_option(const vector<string>& args)
@@ -56,6 +56,18 @@ struct predictor_option
                 if(i == argc - 1)
                     throw invalid_argument("invalid command\n");
                 model_number_type = args[++i];
+            }
+            else if(args[i].compare("-cn") == 0)
+            {
+                if(i == argc - 1)
+                    throw invalid_argument("invalid command\n");
+                column_name = args[++i];
+            }
+            else if(args[i].compare("-cs") == 0)
+            {
+                if(i == argc - 1)
+                    throw invalid_argument("invalid command\n");
+                combine_schema = args[++i];
             }
             else
             {

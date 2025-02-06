@@ -19,6 +19,9 @@ string predict_help()
             "-core <threads_num>: set the number of threads\tdefault:1\n"
             "-out <predict_path>: set the predict path\n"
             "-mnt <model_number_type>: double or float\tdefault:double\n"
+            "-ift <input_format>: libsvm or df\tdefault:'libsvm'\n"
+            "-cn <column_name>: string\tdefault:''\n"
+            "-cs <combine_schema>: string\tdefault:''\n"
     );
 }
 
@@ -33,6 +36,10 @@ int predict(const predictor_option& opt)
     return 0;
 }
 
+std::vector<std::string> fm_sample::column_names;
+std::vector<std::string> fm_sample::combine_schema;
+int fm_sample::column_names_size;
+int fm_sample::combine_schema_size;
 
 int main(int argc, char* argv[])
 {
@@ -43,6 +50,19 @@ int main(int argc, char* argv[])
     try
     {
         opt.parse_option(utils::argv_to_args(argc, argv));
+        fm_sample::init_column_names(opt.column_name);
+        fm_sample::init_combine_schema(opt.combine_schema);
+        cout << "column_name:";
+        for (auto& value: fm_sample::column_names) {
+            cout << value << " "; 
+        }
+        cout << "all_size:" << fm_sample::column_names_size << endl;
+        cout << "combine_schema:";
+        for (auto& value: fm_sample::combine_schema) {
+           cout << value << " "; 
+        }
+        cout << "all_size:" << fm_sample::combine_schema_size << endl;
+        cout << endl;
     }
     catch(const invalid_argument& e)
     {

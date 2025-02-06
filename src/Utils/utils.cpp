@@ -1,5 +1,7 @@
 #include <cmath>
 #include <stdlib.h>
+#include <iostream>
+#include <sstream>
 #include "utils.h"
 
 const double kPrecision = 0.0000000001;
@@ -74,5 +76,20 @@ vector<string> utils::argv_to_args(int argc, char* argv[])
         args.push_back(string(argv[i]));
     }
     return args;
+}
+
+// 字符串分割函数，当元素为空字符串时保留
+void utils::split(const std::string& str, char delimiter, std::vector<std::string>& result) {
+    std::string token;
+    for (char c : str) {
+        if (c == delimiter) {
+            result.push_back(token);
+            token.clear();
+        } else {
+            token += c;
+        }
+    }
+    // 处理最后一个分割后的字符串
+    result.push_back(token);
 }
 

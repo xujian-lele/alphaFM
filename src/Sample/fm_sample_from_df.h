@@ -10,6 +10,7 @@
 #include <numeric>
 #include <iterator>
 #include <functional>
+#include "../Utils/utils.h"
 
 using namespace std;
 
@@ -20,33 +21,52 @@ public:
     int y;
     vector<pair<string, double> > x;
     fm_sample(const string& line);
-    std::vector<std::string> split(const std::string& s, char delimiter);
+    // std::vector<std::string> split(const std::string& s, char delimiter);
     std::vector<std::vector<std::string>> cartesian_product(const std::vector<std::vector<std::string>>& vectors);
     bool is_valid_value(const std::string& value);
-    static const std::vector<std::string> column_names;
-    static const std::vector<std::string> combine_schema;
+    static std::vector<std::string> column_names;
+    static int column_names_size;
+    static std::vector<std::string> combine_schema;
+    static int combine_schema_size;
+    // 接收字符串参数的静态初始化函数
+    static void init_column_names(const std::string& input) {
+        std::istringstream iss(input);
+        std::string item;
+        // 按逗号分割字符串
+        while (std::getline(iss, item, ',')) {
+            fm_sample::column_names.push_back(item);
+        }
+        fm_sample::column_names_size = fm_sample::column_names.size();
+    }
+
+    static void init_combine_schema(const std::string& input) {
+        std::istringstream iss(input);
+        std::string item;
+        // 按逗号分割字符串
+        while (std::getline(iss, item, ',')) {
+            fm_sample::combine_schema.push_back(item);
+        }
+        fm_sample::combine_schema_size = fm_sample::combine_schema.size();
+    }
 
 private:
     static const string spliter;
     static const string innerSpliter;
-
 };
 
 const string fm_sample::spliter = "\002";
 const string fm_sample::innerSpliter = "\001";
-const vector<std::string> fm_sample::column_names = {"a", "b", "c", "d", "e"};
-const vector<std::string> fm_sample::combine_schema = {"a", "b", "c", "a#b", "a#c", "b#c", "d#e"};
 
-// 分割字符串函数
-vector<string> fm_sample::split(const std::string& s, char delimiter) {
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream tokenStream(s);
-    while (std::getline(tokenStream, token, delimiter)) {
-        tokens.push_back(token);
-    }
-    return tokens;
-}
+// // 分割字符串函数
+// vector<string> fm_sample::split(const std::string& s, char delimiter) {
+//     std::vector<std::string> tokens;
+//     std::string token;
+//     std::istringstream tokenStream(s);
+//     while (std::getline(tokenStream, token, delimiter)) {
+//         tokens.push_back(token);
+//     }
+//     return tokens;
+// }
 
 // 生成笛卡尔积函数
 std::vector<std::vector<std::string>> fm_sample::cartesian_product(const std::vector<std::vector<std::string>>& vectors) {
@@ -73,7 +93,9 @@ bool fm_sample::is_valid_value(const std::string& value) {
 fm_sample::fm_sample(const string& line)
 {
     this->x.clear();
-    std::vector<std::string> row = split(line, '\002');
+    std::vector<std::string> row;
+    row.reserve(column_names_size+1);
+    utils::split(line, '\002', row);
     // 为了方便根据列名获取列索引
     std::unordered_map<std::string, int> column_index;
     for (int i = 0; i < column_names.size(); ++i) {
@@ -92,7 +114,9 @@ fm_sample::fm_sample(const string& line)
         if (schema.find('#') == std::string::npos) {
             // 单字段情况，如 'a', 'b', 'c'
             int col_idx = column_index[schema];
-            std::vector<std::string> values = split(row[col_idx], '\001');
+            std::vector<std::string> values;
+            values.reserve(1);
+            utils::split(row[col_idx], '\001', values);
             for (const auto& value : values) {
                 if (is_valid_value(value)) {
                     this->x.push_back(make_pair(schema + '=' + value, 1));
@@ -100,12 +124,16 @@ fm_sample::fm_sample(const string& line)
             }
         } else {
             // 组合字段情况，如 'a#b', 'a#c' 等
-            std::vector<std::string> cols = split(schema, '#');
+            std::vector<std::string> cols;
+            cols.reserve(3);
+            utils::split(schema, '#', cols);
             std::vector<std::vector<std::string>> col_values;
             col_values.reserve(cols.size());
             for (const auto& col : cols) {
                 int col_idx = column_index[col];
-                std::vector<std::string> values = split(row[col_idx], '\001');
+                std::vector<std::string> values;
+                values.reserve(3);
+                utils::split(row[col_idx], '\001', values);
                 std::vector<std::string> named_values;
                 named_values.reserve(values.size());
                 for (const auto& value : values) {

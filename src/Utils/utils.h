@@ -9,6 +9,7 @@ class utils
 {
 public:
     static void split_string(string& line, char delimiter, vector<string>* r);
+    static void split(const string& str, char delimiter, vector<string>& result);
     static int sgn(double x);
     static double uniform();
     static double gaussian();

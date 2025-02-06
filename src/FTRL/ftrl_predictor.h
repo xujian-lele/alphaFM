@@ -3,7 +3,7 @@
 
 #include "../Frame/pc_frame.h"
 #include "predict_model.h"
-#include "../Sample/fm_sample.h"
+#include "../Sample/fm_sample_from_df.h"
 
 
 struct predictor_option

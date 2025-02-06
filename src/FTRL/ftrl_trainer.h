@@ -3,7 +3,7 @@
 
 #include "../Frame/pc_frame.h"
 #include "ftrl_model.h"
-#include "../Sample/fm_sample.h"
+#include "../Sample/fm_sample_from_df.h"
 #include "../Utils/utils.h"
 #include "../Lock/lock_pool.h"
 

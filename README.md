@@ -70,6 +70,9 @@ alphaFM用于解决这样的问题特别适合，一边从hdfs下载，一边计
 -imf \<initial_model_format\>: 初始化模型文件的格式，txt（文本）或bin（二进制）。	default:txt<br>
 -fvs \<force_v_sparse\>: 为了获得更好的稀疏解。当fvs值为1, 则训练中每当wi = 0，即令vi = 0；当fvs为0时关闭此功能。	default:0<br>
 -mnt \<model_number_type\>: 模型参数在内存中和二进制文件中的类型，double或float。	default:double<br>
+-isf \<input_sample_format\>: 输入样本类型，libsvm或者txt。	default:libsvm<br>
+-cn \<column_name\>: txt格式样本的列名以“,”拼接起来的字符串，isf为txt时生效, 必须设置!default:空字符串<br>
+-cs \<combine_schema\>: 特征序列以“,”拼接的字符串，isf为txt时生效, 必须设置!default:空字符串<br>
 ### fm_predict的参数：
 -m \<model_path\>: 模型文件路径。<br>
 -mf \<model_format\>: 模型文件格式，txt（文本）或bin（二进制）。	default:txt<br>
@@ -77,15 +80,23 @@ alphaFM用于解决这样的问题特别适合，一边从hdfs下载，一边计
 -core \<threads_num\>: 计算线程数。	default:1<br>
 -out \<predict_path\>: 输出文件路径。<br>
 -mnt \<model_number_type\>: 模型参数在内存中和二进制文件中的类型，double或float。	default:double<br>
+-isf \<input_sample_format\>: 输入样本类型，libsvm或者txt。	default:libsvm<br>
+-cn \<column_name\>: txt格式样本的列名以“,”拼接起来的字符串，isf为txt时生效, 必须设置!default:空字符串<br>
+-cs \<combine_schema\>: 特征序列以“,”拼接的字符串，isf为txt时生效, 必须设置!default:空字符串<br>
 ### model_bin_tool的参数：
 -task \<task_type\>: 1-输出模型信息；2-格式转换，bin到txt；3-格式转换，bin到txt，只保留非零特征；4-格式转换，txt到bin。<br>
 -im \<input_model_path\>: 输入模型路径。<br>
 -om \<output_model_path\>: 输出模型路径，用于task 2、3和4。task 4必须指定，task 2和3若不指定则默认为标准输出。<br>
 -dim \<factor_num\>: v的维度，用于task 4。<br>
 -mnt \<model_number_type\>: 模型参数在二进制文件中的类型，用于task 4，double或float。	default:double<br>
+
+
 ## 计算速度：
 ### 我的实验结果：
 本地1000万的样本，200万的特征维度，2.10GHz的CPU，开10个线程，非缺省参数如下：<br>
 `-dim 1,1,2 -w_l1 0.05 -v_l1 0.05 -init_stdev 0.001 -w_alpha 0.01 -v_alpha 0.01 -core 10`<br>
 训练时间只需要10多分钟。若指定模型文件为二进制格式，速度会更快。
 
+todo:
+1. 样本处理时，兼容libsvm和txt, 【目前只支持txt】
+2. 性能优化

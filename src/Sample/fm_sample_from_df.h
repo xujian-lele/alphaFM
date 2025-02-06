@@ -57,17 +57,6 @@ private:
 const string fm_sample::spliter = "\002";
 const string fm_sample::innerSpliter = "\001";
 
-// // 分割字符串函数
-// vector<string> fm_sample::split(const std::string& s, char delimiter) {
-//     std::vector<std::string> tokens;
-//     std::string token;
-//     std::istringstream tokenStream(s);
-//     while (std::getline(tokenStream, token, delimiter)) {
-//         tokens.push_back(token);
-//     }
-//     return tokens;
-// }
-
 // 生成笛卡尔积函数
 std::vector<std::vector<std::string>> fm_sample::cartesian_product(const std::vector<std::vector<std::string>>& vectors) {
     std::vector<std::vector<std::string>> result = {{}};

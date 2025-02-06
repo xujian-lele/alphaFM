@@ -32,7 +32,7 @@ string train_help()
             "-imf <initial_model_format>: set the initial model format, txt or bin\tdefault:txt\n"
             "-fvs <force_v_sparse>: if fvs is 1, set vi = 0 whenever wi = 0\tdefault:0\n"
             "-mnt <model_number_type>: double or float\tdefault:double\n"
-            "-ift <input_format>: libsvm or df\tdefault:'libsvm'\n"
+            "-isf <input_format>: libsvm or txt\tdefault:'libsvm'\n"
             "-cn <column_name>: string\tdefault:''\n"
             "-cs <combine_schema>: string\tdefault:''\n"
     );
@@ -83,19 +83,21 @@ int main(int argc, char* argv[])
     try
     {
         opt.parse_option(utils::argv_to_args(argc, argv));
-        fm_sample::init_column_names(opt.column_name);
-        fm_sample::init_combine_schema(opt.combine_schema);
-        cout << "column_name:";
-        for (auto& value: fm_sample::column_names) {
+        if (opt.input_sample_format == "txt") {
+            fm_sample::init_column_names(opt.column_name);
+            fm_sample::init_combine_schema(opt.combine_schema);
+            cout << "column_name:";
+            for (auto& value: fm_sample::column_names) {
+                cout << value << " "; 
+            }
+            cout << "all_size:" << fm_sample::column_names_size << endl;
+            cout << "combine_schema:";
+            for (auto& value: fm_sample::combine_schema) {
             cout << value << " "; 
+            }
+            cout << "all_size:" << fm_sample::combine_schema_size << endl;
+            cout << endl;
         }
-        cout << "all_size:" << fm_sample::column_names_size << endl;
-        cout << "combine_schema:";
-        for (auto& value: fm_sample::combine_schema) {
-           cout << value << " "; 
-        }
-        cout << "all_size:" << fm_sample::combine_schema_size << endl;
-        cout << endl;
     }
     catch(const invalid_argument& e)
     {

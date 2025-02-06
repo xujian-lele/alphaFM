@@ -8,8 +8,8 @@
 
 struct predictor_option
 {
-    predictor_option() : factor_num(8), threads_num(1), model_format("txt") {}
-    string model_path, model_format, predict_path, model_number_type, column_name, combine_schema;
+    predictor_option() : factor_num(8), threads_num(1), model_format("txt"), column_name(""), combine_schema(""), input_sample_format("libsvm") {}
+    string model_path, model_format, predict_path, model_number_type, column_name, combine_schema, input_sample_format;
     int threads_num, factor_num;
     
     void parse_option(const vector<string>& args)
@@ -68,6 +68,12 @@ struct predictor_option
                 if(i == argc - 1)
                     throw invalid_argument("invalid command\n");
                 combine_schema = args[++i];
+            }
+            else if(args[i].compare("-isf") == 0)
+            {
+                if(i == argc - 1)
+                    throw invalid_argument("invalid command\n");
+                input_sample_format = args[++i];
             }
             else
             {

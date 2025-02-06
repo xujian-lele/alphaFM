@@ -12,8 +12,8 @@ struct trainer_option
 {
     trainer_option() : k0(true), k1(true), factor_num(8), init_mean(0.0), init_stdev(0.1), w_alpha(0.05), w_beta(1.0), w_l1(0.1), w_l2(5.0),
                v_alpha(0.05), v_beta(1.0), v_l1(0.1), v_l2(5.0), model_format("txt"), initial_model_format("txt"),
-               threads_num(1), b_init(false), force_v_sparse(false) {}
-    string model_path, model_format, init_model_path, initial_model_format, model_number_type, column_name, combine_schema;
+               threads_num(1), b_init(false), force_v_sparse(false), column_name(""), combine_schema(""), input_sample_format("libsvm") {}
+    string model_path, model_format, init_model_path, initial_model_format, model_number_type, column_name, combine_schema, input_sample_format;
     double init_mean, init_stdev;
     double w_alpha, w_beta, w_l1, w_l2;
     double v_alpha, v_beta, v_l1, v_l2;
@@ -152,6 +152,12 @@ struct trainer_option
                 if(i == argc - 1)
                     throw invalid_argument("invalid command\n");
                 combine_schema = args[++i];
+            }
+            else if(args[i].compare("-isf") == 0)
+            {
+                if(i == argc - 1)
+                    throw invalid_argument("invalid command\n");
+                input_sample_format = args[++i];
             }
             else
             {

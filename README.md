@@ -52,9 +52,6 @@ txt样本:`hadoop fs -cat test_data_hdfs_path | ./fm_predict -core 10 -dim 8 -m 
 `bias w w_n w_z`<br>
 其他行的格式为：<br>
 `feature_name w v1 v2 ... vf w_n w_z v_n1 v_n2 ... v_nf v_z1 v_z2 ... v_zf`
-## 预测结果格式：
-`label score`<br>
-其中label为1或-1，score等于预测为正样本的概率值。
 
 ## 参数说明：
 ### fm_train的参数：
@@ -88,6 +85,8 @@ txt样本:`hadoop fs -cat test_data_hdfs_path | ./fm_predict -core 10 -dim 8 -m 
 -isf \<input_sample_format\>: 输入样本类型，libsvm或者txt。	default:libsvm<br>
 -cn \<column_name\>: txt格式样本的列名以“,”拼接起来的字符串，isf为txt时生效, 必须设置!default:空字符串<br>
 -cs \<combine_schema\>: 特征序列以“,”拼接的字符串，isf为txt时生效, 必须设置!default:空字符串<br>
+-pof \<predict_output_format\>: only_label_and_score:输出[label score],default:输入样本最后拼接上"拼接符+score"，输入样本为txt时拼接符为\002,libsvm时为空格<br>
+
 ### model_bin_tool的参数：
 -task \<task_type\>: 1-输出模型信息；2-格式转换，bin到txt；3-格式转换，bin到txt，只保留非零特征；4-格式转换，txt到bin。<br>
 -im \<input_model_path\>: 输入模型路径。<br>
@@ -106,7 +105,7 @@ txt样本:`hadoop fs -cat test_data_hdfs_path | ./fm_predict -core 10 -dim 8 -m 
 ## 开发日志&ToDoList:
 * 支持输入txt样本。done 20250205。
 * txt样本相关配置通过超参数设置。done 20250206。
-* 样本处理时，兼容libsvm和txt, 【目前只支持txt】。done 20250207
-* 模型预估时输出原始行和打分。
+* 样本处理时，兼容libsvm和txt。done 20250207
+* 模型预估时输出原始行和打分。done 20250207
 * 内存优化，提前预分配内存，对vector操作采用更高效算子。
 * 线上推理部分编写。

@@ -9,8 +9,8 @@
 
 struct predictor_option
 {
-    predictor_option() : factor_num(8), threads_num(1), model_format("txt"), column_name(""), combine_schema(""), input_sample_format("libsvm") {}
-    string model_path, model_format, predict_path, model_number_type, column_name, combine_schema, input_sample_format;
+    predictor_option() : factor_num(8), threads_num(1), model_format("txt"), column_name(""), combine_schema(""), input_sample_format("libsvm"), predict_out_format("") {}
+    string model_path, model_format, predict_path, model_number_type, column_name, combine_schema, input_sample_format,predict_out_format;
     int threads_num, factor_num;
     
     void parse_option(const vector<string>& args)
@@ -76,6 +76,12 @@ struct predictor_option
                     throw invalid_argument("invalid command\n");
                 input_sample_format = args[++i];
             }
+            else if(args[i].compare("-pof") == 0)
+            {
+                if(i == argc - 1)
+                    throw invalid_argument("invalid command\n");
+                predict_out_format = args[++i];
+            }
             else
             {
                 throw invalid_argument("invalid command\n");
@@ -99,6 +105,7 @@ private:
     ofstream fPredict;
     mutex outMtx;
     std::string input_sample_format;
+    std::string predict_out_format;
 };
 
 
@@ -120,6 +127,7 @@ ftrl_predictor<T>::ftrl_predictor(const predictor_option& opt)
         exit(1);
     }
     input_sample_format = opt.input_sample_format;
+    predict_out_format = opt.predict_out_format;
 }
 
 
@@ -139,13 +147,21 @@ void ftrl_predictor<T>::run_task(vector<string>& dataBuffer)
         if (input_sample_format == "txt") {
             fm_sample_from_txt sample(dataBuffer[i]);
             double score = pModel->get_score(sample.x, pModel->muBias->wi, pModel->muMap);
-            outputVec[i] = to_string(sample.y) + " " + to_string(score);
+            if (predict_out_format == "only_label_and_score") {
+                outputVec[i] = to_string(sample.y) + " " + to_string(score);
+            } else {
+                outputVec[i] = dataBuffer[i] + "\002" + to_string(score);
+            }
         } else {
             fm_sample sample(dataBuffer[i]);
             double score = pModel->get_score(sample.x, pModel->muBias->wi, pModel->muMap);
-            outputVec[i] = to_string(sample.y) + " " + to_string(score);
+            outputVec[i] = dataBuffer[i] + "\002" + to_string(score);
+            if (predict_out_format == "only_label_and_score") {
+                outputVec[i] = to_string(sample.y) + " " + to_string(score);
+            } else {
+                outputVec[i] = dataBuffer[i] + " " + to_string(score);
+            }
         }
-
     }
     outMtx.lock();
     for(size_t i = 0; i < outputVec.size(); ++i)

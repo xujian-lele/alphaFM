@@ -100,12 +100,6 @@ fm_sample_from_txt::fm_sample_from_txt(const string& line)
             throw length_error("length is not same.column_name:" + to_string(column_names_size) + ",sample:" + to_string(row.size()));
         }
 
-        // // 为了方便根据列名获取列索引
-        // std::unordered_map<std::string, int> column_index;
-        // for (int i = 0; i < column_names.size(); ++i) {
-        //     column_index[column_names[i]] = i;
-        // }
-
         // 列中第一个元素为label!
         int label = atoi(row.at(0).c_str());
         this->y = label > 0 ? 1 : -1;

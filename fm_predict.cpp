@@ -40,6 +40,7 @@ std::vector<std::string> fm_sample_from_txt::column_names;
 std::vector<std::string> fm_sample_from_txt::combine_schema;
 int fm_sample_from_txt::column_names_size;
 int fm_sample_from_txt::combine_schema_size;
+std::unordered_map<std::string, int> fm_sample_from_txt::column_index;
 
 int main(int argc, char* argv[])
 {
@@ -53,6 +54,7 @@ int main(int argc, char* argv[])
         if (opt.input_sample_format == "txt") {
             fm_sample_from_txt::init_column_names(opt.column_name);
             fm_sample_from_txt::init_combine_schema(opt.combine_schema);
+            fm_sample_from_txt::init_column_index();
             cout << "column_name:";
             for (auto& value: fm_sample_from_txt::column_names) {
                 cout << value << " "; 

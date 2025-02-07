@@ -29,6 +29,8 @@ public:
     static int column_names_size;
     static std::vector<std::string> combine_schema;
     static int combine_schema_size;
+    static std::unordered_map<std::string, int> column_index;
+
     // 接收字符串参数的静态初始化函数
     static void init_column_names(const std::string& input) {
         std::istringstream iss(input);
@@ -48,6 +50,13 @@ public:
             fm_sample_from_txt::combine_schema.push_back(item);
         }
         fm_sample_from_txt::combine_schema_size = fm_sample_from_txt::combine_schema.size();
+    }
+    
+    static void init_column_index() {
+        // 为了方便根据列名获取列索引
+        for (int i = 0; i < fm_sample_from_txt::column_names_size; ++i) {
+            fm_sample_from_txt::column_index[fm_sample_from_txt::column_names[i]] = i;
+        }
     }
 
 private:

@@ -107,5 +107,6 @@ txt样本:`hadoop fs -cat test_data_hdfs_path | ./fm_predict -core 10 -dim 8 -m 
 * txt样本相关配置通过超参数设置。done 20250206。
 * 样本处理时，兼容libsvm和txt。done 20250207
 * 模型预估时输出原始行和打分。done 20250207
-* 内存优化，提前预分配内存，对vector操作采用更高效算子。
+* 添加样本处理时的异常操作。
+* 内存优化，提前预分配内存，对vector操作采用更高效算子;column_index设置为静态变量。
 * 线上推理部分编写。

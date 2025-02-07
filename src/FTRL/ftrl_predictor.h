@@ -146,12 +146,16 @@ void ftrl_predictor<T>::run_task(vector<string>& dataBuffer)
     {
         if (input_sample_format == "txt") {
             fm_sample_from_txt sample(dataBuffer[i]);
-            double score = pModel->get_score(sample.x, pModel->muBias->wi, pModel->muMap);
-            if (predict_out_format == "only_label_and_score") {
-                outputVec[i] = to_string(sample.y) + " " + to_string(score);
-            } else {
-                outputVec[i] = dataBuffer[i] + "\002" + to_string(score);
+            if (sample.is_sample_valid)
+            {
+                double score = pModel->get_score(sample.x, pModel->muBias->wi, pModel->muMap);
+                if (predict_out_format == "only_label_and_score") {
+                    outputVec[i] = to_string(sample.y) + " " + to_string(score);
+                } else {
+                    outputVec[i] = dataBuffer[i] + "\002" + to_string(score);
+                }
             }
+
         } else {
             fm_sample sample(dataBuffer[i]);
             double score = pModel->get_score(sample.x, pModel->muBias->wi, pModel->muMap);
@@ -166,7 +170,8 @@ void ftrl_predictor<T>::run_task(vector<string>& dataBuffer)
     outMtx.lock();
     for(size_t i = 0; i < outputVec.size(); ++i)
     {
-        fPredict << outputVec[i] << endl;
+        if (!outputVec[i].empty())
+            fPredict << outputVec[i] << endl;
     }
     outMtx.unlock();
 }

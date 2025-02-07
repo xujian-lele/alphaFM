@@ -24,6 +24,7 @@ public:
     // std::vector<std::string> split(const std::string& s, char delimiter);
     std::vector<std::vector<std::string>> cartesian_product(const std::vector<std::vector<std::string>>& vectors);
     bool is_valid_value(const std::string& value);
+    bool is_sample_valid = true;
     static std::vector<std::string> column_names;
     static int column_names_size;
     static std::vector<std::string> combine_schema;
@@ -81,74 +82,86 @@ bool fm_sample_from_txt::is_valid_value(const std::string& value) {
 
 fm_sample_from_txt::fm_sample_from_txt(const string& line)
 {
-    this->x.clear();
-    std::vector<std::string> row;
-    row.reserve(column_names_size+1);
-    utils::split(line, spliter, row);
-    // 为了方便根据列名获取列索引
-    std::unordered_map<std::string, int> column_index;
-    for (int i = 0; i < column_names.size(); ++i) {
-        column_index[column_names[i]] = i;
-    }
-
-    // 列中第一个元素为label!
-    int label = atoi(row.at(0).c_str());
-    this->y = label > 0 ? 1 : -1;
-
-    // 遍历 combine_schema 中的每一个元素
-    for (const auto& schema : combine_schema) {
-        if (!schema.empty() && schema[0] == '#') {
-                continue;
+    try{
+        this->x.clear();
+        std::vector<std::string> row;
+        row.reserve(column_names_size+1);
+        utils::split(line, spliter, row);
+        if (row.size() != column_names_size) {
+            throw length_error("length is not same.column_name:" + to_string(column_names_size) + ",sample:" + to_string(row.size()));
         }
 
-        if (schema.find('#') == std::string::npos) {
-            // 单字段情况，如 'a', 'b', 'c'
-            int col_idx = column_index[schema];
-            std::vector<std::string> values;
-            values.reserve(1);
-            utils::split(row[col_idx], innerSpliter, values);
-            for (const auto& value : values) {
-                if (is_valid_value(value)) {
-                    this->x.push_back(make_pair(schema + '=' + value, 1));
-                }
+        // 为了方便根据列名获取列索引
+        std::unordered_map<std::string, int> column_index;
+        for (int i = 0; i < column_names.size(); ++i) {
+            column_index[column_names[i]] = i;
+        }
+
+        // 列中第一个元素为label!
+        int label = atoi(row.at(0).c_str());
+        this->y = label > 0 ? 1 : -1;
+
+        // 遍历 combine_schema 中的每一个元素
+        for (const auto& schema : combine_schema) {
+            if (!schema.empty() && schema[0] == '#') {
+                    continue;
             }
-        } else {
-            // 组合字段情况，如 'a#b', 'a#c' 等
-            std::vector<std::string> cols;
-            cols.reserve(3);
-            utils::split(schema, '#', cols);
-            std::vector<std::vector<std::string>> col_values;
-            col_values.reserve(cols.size());
-            for (const auto& col : cols) {
-                int col_idx = column_index[col];
+
+            if (schema.find('#') == std::string::npos) {
+                // 单字段情况，如 'a', 'b', 'c'
+                int col_idx = column_index[schema];
                 std::vector<std::string> values;
-                values.reserve(3);
-                utils::split(row[col_idx], '\001', values);
-                std::vector<std::string> named_values;
-                named_values.reserve(values.size());
+                values.reserve(1);
+                utils::split(row[col_idx], innerSpliter, values);
                 for (const auto& value : values) {
                     if (is_valid_value(value)) {
-                        named_values.push_back(col + "=" + value);
+                        this->x.push_back(make_pair(schema + '=' + value, 1));
                     }
                 }
-                col_values.push_back(named_values);
-            }
-            // 生成笛卡尔积
-            std::vector<std::vector<std::string>> cartesian = cartesian_product(col_values);
-            std::vector<std::string> combined_values;
-            combined_values.reserve(cartesian.size());
-            for (const auto& item : cartesian) {
-                std::string combined = std::accumulate(std::next(item.begin()), item.end(), item[0],
-                                                        [](const std::string& a, const std::string& b) {
-                                                            return a + '#' + b;
-                                                        });
-                combined_values.push_back(combined);
-            }
-            for (const auto& value : combined_values) {
-                this->x.push_back(make_pair(value, 1));
+            } else {
+                // 组合字段情况，如 'a#b', 'a#c' 等
+                std::vector<std::string> cols;
+                cols.reserve(3);
+                utils::split(schema, '#', cols);
+                std::vector<std::vector<std::string>> col_values;
+                col_values.reserve(cols.size());
+                for (const auto& col : cols) {
+                    int col_idx = column_index[col];
+                    std::vector<std::string> values;
+                    values.reserve(3);
+                    utils::split(row[col_idx], '\001', values);
+                    std::vector<std::string> named_values;
+                    named_values.reserve(values.size());
+                    for (const auto& value : values) {
+                        if (is_valid_value(value)) {
+                            named_values.push_back(col + "=" + value);
+                        }
+                    }
+                    col_values.push_back(named_values);
+                }
+                // 生成笛卡尔积
+                std::vector<std::vector<std::string>> cartesian = cartesian_product(col_values);
+                std::vector<std::string> combined_values;
+                combined_values.reserve(cartesian.size());
+                for (const auto& item : cartesian) {
+                    std::string combined = std::accumulate(std::next(item.begin()), item.end(), item[0],
+                                                            [](const std::string& a, const std::string& b) {
+                                                                return a + '#' + b;
+                                                            });
+                    combined_values.push_back(combined);
+                }
+                for (const auto& value : combined_values) {
+                    this->x.push_back(make_pair(value, 1));
+                }
             }
         }
+    } 
+    catch(const length_error& e)
+    {
+        cerr << "length_error:" << e.what() << endl;
+        this->is_sample_valid = false;
     }
+    
 }
 
 

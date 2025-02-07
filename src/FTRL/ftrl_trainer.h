@@ -221,7 +221,8 @@ void ftrl_trainer<T>::run_task(vector<string>& dataBuffer)
     {
         if (input_sample_format == "txt") {
             fm_sample_from_txt sample(dataBuffer[i]);
-            train(sample.y, sample.x);
+            if (sample.is_sample_valid)
+                train(sample.y, sample.x);
         } else {
             fm_sample sample(dataBuffer[i]);
             train(sample.y, sample.x);

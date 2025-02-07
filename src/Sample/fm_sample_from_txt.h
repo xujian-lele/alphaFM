@@ -76,7 +76,7 @@ std::vector<std::vector<std::string>> fm_sample_from_txt::cartesian_product(cons
         for (const auto& res : result) {
             for (const auto& val : vec) {
                 temp.emplace_back(res);
-                temp.back().push_back(val);
+                temp.back().emplace_back(val);
             }
         }
         result = std::move(temp);

@@ -36,7 +36,7 @@ public:
         std::string item;
         // 按逗号分割字符串
         while (std::getline(iss, item, ',')) {
-            fm_sample_from_txt::column_names.push_back(item);
+            fm_sample_from_txt::column_names.emplace_back(item);
         }
         fm_sample_from_txt::column_names_size = fm_sample_from_txt::column_names.size();
     }
@@ -46,7 +46,7 @@ public:
         std::string item;
         // 按逗号分割字符串
         while (std::getline(iss, item, ',')) {
-            fm_sample_from_txt::combine_schema.push_back(item);
+            fm_sample_from_txt::combine_schema.emplace_back(item);
         }
         fm_sample_from_txt::combine_schema_size = fm_sample_from_txt::combine_schema.size();
     }
@@ -125,7 +125,10 @@ fm_sample_from_txt::fm_sample_from_txt(const string& line)
                 utils::split(row[col_idx], innerSpliter, values);
                 for (const auto& value : values) {
                     if (is_valid_value(value)) {
-                        this->x.push_back(make_pair(schema + '=' + value, 1));
+                        std::string fea = schema;
+                        fea += "=";
+                        fea += value;
+                        this->x.emplace_back(std::move(fea), 1);
                     }
                 }
             } else {

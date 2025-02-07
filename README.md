@@ -85,7 +85,7 @@ txt样本:`hadoop fs -cat test_data_hdfs_path | ./fm_predict -core 10 -dim 8 -m 
 -isf \<input_sample_format\>: 输入样本类型，libsvm或者txt。	default:libsvm<br>
 -cn \<column_name\>: txt格式样本的列名以“,”拼接起来的字符串，isf为txt时生效, 必须设置!default:空字符串<br>
 -cs \<combine_schema\>: 特征序列以“,”拼接的字符串，isf为txt时生效, 必须设置!default:空字符串<br>
--pof \<predict_output_format\>: only_label_and_score:输出[label score],default:输入样本最后拼接上"拼接符+score"，输入样本为txt时拼接符为\002,libsvm时为空格<br>
+-pof \<predict_output_format\>: only_label_and_score:输出"label+空格+score",default:"输入样本+拼接符+score"，输入样本为txt时拼接符为\002,libsvm时为空格<br>
 
 ### model_bin_tool的参数：
 -task \<task_type\>: 1-输出模型信息；2-格式转换，bin到txt；3-格式转换，bin到txt，只保留非零特征；4-格式转换，txt到bin。<br>

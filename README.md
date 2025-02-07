@@ -106,7 +106,7 @@ txt样本:`hadoop fs -cat test_data_hdfs_path | ./fm_predict -core 10 -dim 8 -m 
 ## 开发日志&ToDoList:
 * 支持输入txt样本。done 20250205。
 * txt样本相关配置通过超参数设置。done 20250206。
-* 样本处理时，兼容libsvm和txt, 【目前只支持txt】。
-* 模型预估时输出原始字符串。
+* 样本处理时，兼容libsvm和txt, 【目前只支持txt】。done 20250207
+* 模型预估时输出原始行和打分。
 * 内存优化，提前预分配内存，对vector操作采用更高效算子。
 * 线上推理部分编写。

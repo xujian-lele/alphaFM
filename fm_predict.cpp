@@ -36,10 +36,10 @@ int predict(const predictor_option& opt)
     return 0;
 }
 
-std::vector<std::string> fm_sample::column_names;
-std::vector<std::string> fm_sample::combine_schema;
-int fm_sample::column_names_size;
-int fm_sample::combine_schema_size;
+std::vector<std::string> fm_sample_from_txt::column_names;
+std::vector<std::string> fm_sample_from_txt::combine_schema;
+int fm_sample_from_txt::column_names_size;
+int fm_sample_from_txt::combine_schema_size;
 
 int main(int argc, char* argv[])
 {
@@ -51,19 +51,18 @@ int main(int argc, char* argv[])
     {
         opt.parse_option(utils::argv_to_args(argc, argv));
         if (opt.input_sample_format == "txt") {
-            fm_sample::init_column_names(opt.column_name);
-            fm_sample::init_combine_schema(opt.combine_schema);
+            fm_sample_from_txt::init_column_names(opt.column_name);
+            fm_sample_from_txt::init_combine_schema(opt.combine_schema);
             cout << "column_name:";
-            for (auto& value: fm_sample::column_names) {
+            for (auto& value: fm_sample_from_txt::column_names) {
                 cout << value << " "; 
             }
-            cout << "all_size:" << fm_sample::column_names_size << endl;
+            cout << "all_size:" << fm_sample_from_txt::column_names_size << endl;
             cout << "combine_schema:";
-            for (auto& value: fm_sample::combine_schema) {
+            for (auto& value: fm_sample_from_txt::combine_schema) {
             cout << value << " "; 
             }
-            cout << "all_size:" << fm_sample::combine_schema_size << endl;
-            cout << endl;
+            cout << "all_size:" << fm_sample_from_txt::combine_schema_size << endl;
         }
     }
     catch(const invalid_argument& e)

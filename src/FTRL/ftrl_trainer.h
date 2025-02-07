@@ -3,7 +3,8 @@
 
 #include "../Frame/pc_frame.h"
 #include "ftrl_model.h"
-#include "../Sample/fm_sample_from_df.h"
+#include "../Sample/fm_sample_from_txt.h"
+#include "../Sample/fm_sample.h"
 #include "../Utils/utils.h"
 #include "../Lock/lock_pool.h"
 
@@ -189,6 +190,7 @@ private:
     bool k0;
     bool k1;
     bool force_v_sparse;
+    std::string input_sample_format;
 };
 
 
@@ -208,6 +210,7 @@ ftrl_trainer<T>::ftrl_trainer(const trainer_option& opt)
     force_v_sparse = opt.force_v_sparse;
     pModel = new ftrl_model<T>(opt.factor_num, opt.init_mean, opt.init_stdev);
     pLockPool = new lock_pool();
+    input_sample_format = opt.input_sample_format;
 }
 
 
@@ -216,8 +219,13 @@ void ftrl_trainer<T>::run_task(vector<string>& dataBuffer)
 {
     for(size_t i = 0; i < dataBuffer.size(); ++i)
     {
-        fm_sample sample(dataBuffer[i]);
-        train(sample.y, sample.x);
+        if (input_sample_format == "txt") {
+            fm_sample_from_txt sample(dataBuffer[i]);
+            train(sample.y, sample.x);
+        } else {
+            fm_sample sample(dataBuffer[i]);
+            train(sample.y, sample.x);
+        }
     }
 }
 

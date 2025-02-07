@@ -11,9 +11,11 @@ FTRL是一种online learning算法，在Google于2013年给出的论文中用于
 这样规模的数据完全加载到内存训练已经不太现实，甚至下载到本地硬盘都很困难，一般都是经过spark生成样本直接存储在hdfs上。<br>
 alphaFM用于解决这样的问题特别适合，一边从hdfs下载，一边计算，一个典型的使用方法是这样：<br>
 训练：10个线程计算，factorization的维度是8，最后得到模型文件fm_model.txt<br>
-`hadoop fs -cat train_data_hdfs_path | ./fm_train -core 10 -dim 1,1,8 -m fm_model.txt`<br>
+lisbsvm样本:`hadoop fs -cat train_data_hdfs_path | ./fm_train -core 10 -dim 1,1,8 -m fm_model.txt`<br>
+txt样本: `hadoop fs -cat train_data_hdfs_path | ./fm_train -core 10 -dim 1,1,8 -m fm_model.txt -cn label,a,b,c,d -cs a,b,c,d,a#b -isf txt`<br>
 测试：10个线程计算，factorization的维度是8，加载模型文件fm_model.txt，最后输出预测结果文件fm_pre.txt<br>
-`hadoop fs -cat test_data_hdfs_path | ./fm_predict -core 10 -dim 8 -m fm_model.txt -out fm_pre.txt`<br>
+libsvm样本:`hadoop fs -cat test_data_hdfs_path | ./fm_predict -core 10 -dim 8 -m fm_model.txt -out fm_pre.txt`<br>
+txt样本:`hadoop fs -cat test_data_hdfs_path | ./fm_predict -core 10 -dim 8 -m fm_model.txt -out fm_pre.txt -cn label,a,b,c,d -cs a,b,c,d,a#b -isf txt`<br>
 当然，如果样本文件不大，也可以先下载到本地，然后再运行alphaFM。<br>
 
 * 由于采用了FTRL，调好参数后，训练样本只需过一遍即可收敛，无需多次迭代，因此alphaFM读取训练样本采用了管道的方式，这样的好处除了节省内存，
@@ -37,11 +39,13 @@ alphaFM用于解决这样的问题特别适合，一边从hdfs下载，一边计
 ## 安装方法：
 直接在根目录make即可，编译后会在bin目录下生成三个可执行文件。如果编译失败，请升级gcc版本。
 ## 输入文件格式：
-类似于libsvm格式，但更加灵活：特征编号不局限于整数也可以是字符串；特征值可以是整数或浮点数（特征值最好做归一化处理，否则可能会导致结果为nan），
-特征值为0的项可以省略不写；正负label可以是1/0或者1/-1。举例如下：<br>
-`1 sex:1 age:0.3 f1:1 f3:0.9`<br>
-`0 sex:0 age:0.7 f2:0.4 f5:0.8 f8:1`<br>
-`...`<br>
+*类似于libsvm格式，但更加灵活：特征编号不局限于整数也可以是字符串；特征值可以是整数或浮点数（特征值最好做归一化处理，否则可能会导致结果为nan），特征值为0的项可以省略不写；正负label可以是1/0或者1/-1。举例如下：<br>
+   `1 sex:1 age:0.3 f1:1 f3:0.9`<br>
+   `0 sex:0 age:0.7 f2:0.4 f5:0.8 f8:1`<br>
+* txt格式
+   * 内容:列间用\002分割，同列多个值用\001分割，其中第一列为label，正样本取值为1，负样本为0或者-1
+       `1\0021\0012\0023\00210\00220\00130\002f`<br>
+       `0\0021\0012\0023\00210\00220\00130\002f`<br>
 ## txt模型文件格式：
 第一行是bias的参数：<br>
 `bias w w_n w_z`<br>
@@ -104,4 +108,4 @@ alphaFM用于解决这样的问题特别适合，一边从hdfs下载，一边计
 * 样本处理时，兼容libsvm和txt, 【目前只支持txt】。
 * 模型预估时输出原始字符串。
 * 内存优化，提前预分配内存，对vector操作采用更高效算子。
-* fm线上推理部分编写。
+* 线上推理部分编写。

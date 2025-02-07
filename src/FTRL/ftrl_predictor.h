@@ -3,7 +3,8 @@
 
 #include "../Frame/pc_frame.h"
 #include "predict_model.h"
-#include "../Sample/fm_sample_from_df.h"
+#include "../Sample/fm_sample_from_txt.h"
+#include "../Sample/fm_sample.h"
 
 
 struct predictor_option
@@ -97,6 +98,7 @@ private:
     predict_model<T>* pModel;
     ofstream fPredict;
     mutex outMtx;
+    std::string input_sample_format;
 };
 
 
@@ -117,6 +119,7 @@ ftrl_predictor<T>::ftrl_predictor(const predictor_option& opt)
         cerr << "open output file error!" << endl;
         exit(1);
     }
+    input_sample_format = opt.input_sample_format;
 }
 
 
@@ -133,9 +136,16 @@ void ftrl_predictor<T>::run_task(vector<string>& dataBuffer)
     vector<string> outputVec(dataBuffer.size());
     for(size_t i = 0; i < dataBuffer.size(); ++i)
     {
-        fm_sample sample(dataBuffer[i]);
-        double score = pModel->get_score(sample.x, pModel->muBias->wi, pModel->muMap);
-        outputVec[i] = to_string(sample.y) + " " + to_string(score);
+        if (input_sample_format == "txt") {
+            fm_sample_from_txt sample(dataBuffer[i]);
+            double score = pModel->get_score(sample.x, pModel->muBias->wi, pModel->muMap);
+            outputVec[i] = to_string(sample.y) + " " + to_string(score);
+        } else {
+            fm_sample sample(dataBuffer[i]);
+            double score = pModel->get_score(sample.x, pModel->muBias->wi, pModel->muMap);
+            outputVec[i] = to_string(sample.y) + " " + to_string(score);
+        }
+
     }
     outMtx.lock();
     for(size_t i = 0; i < outputVec.size(); ++i)

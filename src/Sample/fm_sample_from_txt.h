@@ -199,5 +199,4 @@ fm_sample_from_txt::fm_sample_from_txt(const string& line)
     }
 }
 
-
 #endif /*FM_SAMPLE_FROM_TXT_H_*/

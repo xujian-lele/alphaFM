@@ -56,7 +56,7 @@ fm_sample::fm_sample(const string& line)
         value = stod(line.substr(posb, pose-posb));
         if(value != 0)
         {
-            this->x.push_back(make_pair(key, value));
+            this->x.emplace_back(key, value);
         }
     }
 }
